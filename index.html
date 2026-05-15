@@ -1,339 +1,392 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Charat — Marathon Training Dashboard</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/2.12.7/Recharts.min.js"></script>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: #0f1419; font-family: 'Segoe UI', system-ui, sans-serif; }
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: #0f1419; }
-    ::-webkit-scrollbar-thumb { background: #1e2d3d; border-radius: 3px; }
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Charat — Marathon Dashboard</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0f1419;color:#f1f5f9;font-family:'Segoe UI',system-ui,sans-serif;font-size:15px}
+.header{background:#141c24;border-bottom:1px solid #1e2d3d;padding:24px 20px 0}
+.header-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.days-box{background:#0f2d1c;border:2px solid #4ade80;border-radius:16px;padding:14px 20px;text-align:center;min-width:80px}
+.days-num{font-size:36px;font-weight:900;color:#4ade80;line-height:1}
+.days-label{font-size:12px;color:#86efac;font-weight:600;margin-top:4px}
+.tabs{display:flex;border-top:1px solid #1e2d3d}
+.tab{flex:1;padding:12px 8px;background:transparent;border:none;border-bottom:3px solid transparent;color:#64748b;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .2s}
+.tab.active{background:#1e3a2f;border-bottom:3px solid #4ade80;color:#4ade80;font-weight:700}
+.content{padding:20px 16px;max-width:720px;margin:0 auto}
+.page{display:none}.page.active{display:block}
+.kpi-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px}
+.kpi-card{border-radius:14px;padding:16px 12px;text-align:center}
+.kpi-label{font-size:12px;color:#94a3b8;font-weight:600;margin-bottom:6px;text-transform:uppercase;letter-spacing:1px}
+.kpi-value{font-size:28px;font-weight:900;line-height:1}
+.kpi-sub{font-size:11px;color:#64748b;margin-top:6px}
+.card{background:#141c24;border-radius:16px;padding:20px 16px;margin-bottom:16px;border:1px solid #1e2d3d}
+.card-title{font-size:17px;font-weight:700;color:#fff;margin-bottom:2px}
+.card-sub{font-size:13px;color:#64748b;margin-bottom:16px}
+.legend{display:flex;gap:20px;margin-top:12px}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:#94a3b8}
+.legend-dot{width:14px;height:14px;border-radius:3px}
+.legend-line{width:20px;height:3px;border-radius:2px}
+.warn{background:#2a1f00;border:1px solid rgba(245,158,11,.4);border-radius:10px;padding:10px 14px;font-size:13px;color:#fbbf24;margin-top:10px}
+.zone-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-bottom:16px}
+.zone-cell{background:#0f1419;border-radius:8px;padding:8px 10px;border:1px solid #1e2d3d}
+.zone-name{font-size:13px;font-weight:800;color:#fff;margin-bottom:4px}
+.zone-pace{font-size:10px;color:#60a5fa;margin-bottom:2px}
+.zone-hr{font-size:10px;color:#f87171}
+.session-card{background:#141c24;border:1px solid #1e2d3d;border-radius:14px;padding:16px;margin-bottom:12px}
+.session-header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.badge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:6px;letter-spacing:1px}
+.session-body{display:grid;grid-template-columns:1fr 1fr;gap:8px 24px;flex:1}
+.metric-label{font-size:11px;color:#64748b;margin-bottom:1px}
+.metric-val{font-size:15px;font-weight:700;color:#e2e8f0}
+.mrs-box{text-align:center;min-width:70px;margin-left:12px}
+.mrs-big{font-size:30px;font-weight:900;color:#4ade80;line-height:1}
+.mrs-label{font-size:11px;color:#64748b;margin-bottom:8px}
+.conf-big{font-size:18px;font-weight:800;color:#fbbf24}
+.upcoming-card{border-radius:14px;padding:14px 16px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;border:1px solid #1e2d3d;background:#141c24}
+.upcoming-card.race{background:#2d0f0f;border-color:rgba(248,113,113,.5)}
+.upcoming-title{font-size:15px;font-weight:700;color:#f1f5f9;margin-bottom:4px}
+.upcoming-detail{font-size:13px;color:#94a3b8}
+.date-badge{font-size:12px;font-weight:700;padding:6px 12px;border-radius:8px;white-space:nowrap;margin-left:12px}
+.improve-card{border-radius:12px;padding:14px 16px;margin-bottom:10px;display:flex;gap:14px;align-items:flex-start}
+.improve-icon{font-size:22px;line-height:1.2}
+.improve-title-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;flex-wrap:wrap;gap:6px}
+.improve-title{font-size:15px;font-weight:700;color:#f1f5f9}
+.impact-badge{font-size:12px;font-weight:700;padding:2px 10px;border-radius:6px}
+.improve-desc{font-size:13px;color:#94a3b8;line-height:1.6}
+.vol-row{margin-bottom:16px}
+.vol-header{display:flex;justify-content:space-between;margin-bottom:6px}
+.vol-bar-bg{height:10px;background:#1e2d3d;border-radius:6px;overflow:hidden}
+.vol-bar{height:100%;border-radius:6px}
+.footer{margin-top:24px;text-align:center;font-size:12px;color:#334155;padding-bottom:32px}
+svg text{font-family:'Segoe UI',system-ui,sans-serif}
+</style>
 </head>
 <body>
-  <div id="root"></div>
 
-  <script type="text/babel">
-    const { useState } = React;
-    const {
-      LineChart, Line, BarChart, Bar,
-      XAxis, YAxis, CartesianGrid, Tooltip,
-      ResponsiveContainer, ReferenceLine, Area, AreaChart,
-    } = Recharts;
+<div class="header">
+  <div class="header-top">
+    <div>
+      <div style="font-size:12px;color:#4ade80;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">🏃 Marathon Training</div>
+      <div style="font-size:24px;font-weight:800;color:#fff">Charat Chukiat</div>
+      <div style="font-size:14px;color:#64748b;margin-top:2px">Perth Marathon · Oct 11, 2026 · Sub-4:00</div>
+    </div>
+    <div class="days-box">
+      <div class="days-num" id="daysLeft">—</div>
+      <div class="days-label">days left</div>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('overview',this)">Overview</button>
+    <button class="tab" onclick="showTab('sessions',this)">Sessions</button>
+    <button class="tab" onclick="showTab('upcoming',this)">Upcoming</button>
+  </div>
+</div>
 
-    const sessions = [
-      { date: "Mar 15", type: "Long Run", km: 18,  pace: 6.85, hr: 143, zone: "Z2",    mrs: 59, conf: 40 },
-      { date: "Mar 22", type: "Interval", km: 10,  pace: 6.35, hr: 148, zone: "Z3",    mrs: 60, conf: 41 },
-      { date: "Mar 29", type: "Long Run", km: 20,  pace: 6.87, hr: 144, zone: "Z2",    mrs: 61, conf: 42 },
-      { date: "Apr 5",  type: "Interval", km: 9,   pace: 6.28, hr: 149, zone: "Z3",    mrs: 61, conf: 43 },
-      { date: "Apr 12", type: "Long Run", km: 22,  pace: 6.82, hr: 143, zone: "Z2",    mrs: 62, conf: 43 },
-      { date: "Apr 19", type: "Interval", km: 10,  pace: 6.25, hr: 150, zone: "Z3",    mrs: 62, conf: 44 },
-      { date: "Apr 26", type: "Long Run", km: 24,  pace: 6.80, hr: 142, zone: "Z2",    mrs: 63, conf: 45 },
-      { date: "May 9",  type: "Long Run", km: 16,  pace: 7.07, hr: 139, zone: "Z1/Z2", mrs: 63, conf: 46 },
-      { date: "May 13", type: "Interval", km: 6.4, pace: 6.53, hr: 146, zone: "Z3",    mrs: 65, conf: 48 },
-      { date: "May 15", type: "Recovery", km: 6,   pace: 7.73, hr: 131, zone: "Z1",    mrs: 65, conf: 48 },
-    ];
+<div class="content">
 
-    const upcomingSessions = [
-      { date: "May 16", label: "Long Run Q1",      detail: "16km easy @ 6:45–7:00/km",         type: "long"     },
-      { date: "May 18", label: "Easy Run + S&C",   detail: "8km @ 6:45–7:00/km",               type: "easy"     },
-      { date: "May 19", label: "Easy Run",          detail: "8km @ 6:45–7:00/km",               type: "easy"     },
-      { date: "May 20", label: "LT1 Intervals Q2", detail: "2×20min @ 6:10–6:30/km",           type: "interval" },
-      { date: "May 22", label: "Recovery Run",      detail: "5km @ 7:30+/km",                   type: "recovery" },
-      { date: "May 23", label: "Long Run Q1",       detail: "18km (14km easy + 4km steady)",    type: "long"     },
-      { date: "May 27", label: "LT1 Intervals Q1", detail: "2×15min @ 6:10–6:30/km",           type: "interval" },
-      { date: "May 30", label: "Long Run Q1",       detail: "15km easy @ 6:45–7:00/km",         type: "long"     },
-      { date: "May 31", label: "Skecher Run 10K 🏁",detail: "Race Day!",                        type: "race"     },
-    ];
+  <!-- OVERVIEW -->
+  <div class="page active" id="page-overview">
 
-    const paceZoneData = [
-      { zone: "Z1", paceRange: ">7:00",     hrRange: "<132",    target: 20, actual: 35 },
-      { zone: "Z2", paceRange: "6:35–7:00", hrRange: "132–149", target: 60, actual: 52 },
-      { zone: "Z3", paceRange: "6:00–6:35", hrRange: "150–157", target: 18, actual: 12 },
-      { zone: "Z4", paceRange: "<6:00",     hrRange: ">158",    target: 2,  actual: 1  },
-    ];
+    <div class="kpi-grid">
+      <div class="kpi-card" style="background:#0f2d1c;border:1.5px solid rgba(74,222,128,.25)">
+        <div class="kpi-label">Readiness</div>
+        <div class="kpi-value" style="color:#4ade80">65<span style="font-size:13px">/100</span></div>
+        <div class="kpi-sub">↑ +6 since Oct '25</div>
+      </div>
+      <div class="kpi-card" style="background:#2a1f00;border:1.5px solid rgba(251,191,36,.25)">
+        <div class="kpi-label">Sub-4 Conf.</div>
+        <div class="kpi-value" style="color:#fbbf24">48<span style="font-size:13px">%</span></div>
+        <div class="kpi-sub">↑ +8% since Oct '25</div>
+      </div>
+      <div class="kpi-card" style="background:#0d1f35;border:1.5px solid rgba(96,165,250,.25)">
+        <div class="kpi-label">Next Target</div>
+        <div class="kpi-value" style="color:#60a5fa">50<span style="font-size:13px">km</span></div>
+        <div class="kpi-sub">Week May 18–23</div>
+      </div>
+    </div>
 
-    const typeStyle = {
-      "Long Run": { bg: "#052e1a", color: "#4ade80", label: "LONG RUN" },
-      "Interval":  { bg: "#2d1f02", color: "#fbbf24", label: "INTERVAL" },
-      "Recovery":  { bg: "#1e1035", color: "#c4b5fd", label: "RECOVERY" },
-    };
+    <!-- Progress Chart -->
+    <div class="card">
+      <div class="card-title">📈 Progress Over Time</div>
+      <div class="card-sub">Readiness Score & Sub-4 Confidence</div>
+      <svg id="progressChart" width="100%" height="200" viewBox="0 0 660 200"></svg>
+      <div class="legend">
+        <div class="legend-item"><div class="legend-line" style="background:#4ade80"></div>Readiness Score</div>
+        <div class="legend-item"><div class="legend-line" style="background:#fbbf24;border-top:2px dashed #fbbf24;height:0"></div>Sub-4 Confidence %</div>
+      </div>
+    </div>
 
-    const sessionTypeColor = {
-      long: "#4ade80", easy: "#60a5fa",
-      interval: "#fbbf24", recovery: "#c4b5fd", race: "#f87171",
-    };
+    <!-- Zone Distribution -->
+    <div class="card">
+      <div class="card-title">🎯 Zone Distribution</div>
+      <div class="card-sub">Actual vs Target — based on Pace & Heart Rate</div>
+      <div class="zone-grid">
+        <div class="zone-cell"><div class="zone-name">Z1</div><div class="zone-pace">⚡ &gt;7:00 /km</div><div class="zone-hr">❤️ &lt;132 bpm</div></div>
+        <div class="zone-cell"><div class="zone-name">Z2</div><div class="zone-pace">⚡ 6:35–7:00 /km</div><div class="zone-hr">❤️ 132–149 bpm</div></div>
+        <div class="zone-cell"><div class="zone-name">Z3</div><div class="zone-pace">⚡ 6:00–6:35 /km</div><div class="zone-hr">❤️ 150–157 bpm</div></div>
+        <div class="zone-cell"><div class="zone-name">Z4</div><div class="zone-pace">⚡ &lt;6:00 /km</div><div class="zone-hr">❤️ &gt;158 bpm</div></div>
+      </div>
+      <svg id="zoneChart" width="100%" height="180" viewBox="0 0 660 180"></svg>
+      <div class="legend" style="margin-top:10px;margin-bottom:10px">
+        <div class="legend-item"><div class="legend-dot" style="background:#475569"></div>Target %</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#4ade80"></div>Actual %</div>
+      </div>
+      <div class="warn">⚠️ Z2 under target — 52% vs 60% goal. Tighten easy run pace to 6:45–6:55/km.</div>
+    </div>
 
-    const paceFormat = (v) => {
-      const min = Math.floor(v);
-      const sec = Math.round((v - min) * 60);
-      return `${min}:${sec.toString().padStart(2, "0")}`;
-    };
+    <!-- Pace Chart -->
+    <div class="card">
+      <div class="card-title">⚡ Avg Pace Per Session</div>
+      <div class="card-sub">min/km across all sessions</div>
+      <svg id="paceChart" width="100%" height="180" viewBox="0 0 660 180"></svg>
+    </div>
 
-    const CustomTooltip = ({ active, payload, label }) => {
-      if (!active || !payload?.length) return null;
-      return (
-        <div style={{ background: "#1e2530", border: "1px solid #334155", borderRadius: 10, padding: "10px 16px", fontSize: 13, color: "#f1f5f9" }}>
-          <div style={{ color: "#94a3b8", marginBottom: 6, fontSize: 12 }}>{label}</div>
-          {payload.map((p, i) => (
-            <div key={i} style={{ color: p.color, marginBottom: 2 }}>
-              {p.name}: <strong style={{ color: "#fff" }}>{p.value}</strong>
-            </div>
-          ))}
+    <!-- How to Improve -->
+    <div class="card">
+      <div class="card-title">🚀 How to Move the Numbers</div>
+      <div class="card-sub">สิ่งที่ต้องทำใน session ถัดๆ ไปเพื่อเพิ่ม MRS & Sub-4 Confidence</div>
+      <div class="improve-card" style="background:#0f2d1c;border:1px solid rgba(74,222,128,.2);border-left:4px solid #4ade80">
+        <div class="improve-icon">📦</div>
+        <div style="flex:1">
+          <div class="improve-title-row"><span class="improve-title">เพิ่ม Z2 Volume</span><span class="impact-badge" style="color:#4ade80;background:rgba(74,222,128,.1)">MRS +2–3</span></div>
+          <div class="improve-desc">Easy run ให้อยู่ที่ 6:45–6:55/km จริงๆ อย่าปล่อยให้ drift เกิน 7:05 ทำสม่ำเสมอ 3–4 ครั้ง/สัปดาห์</div>
         </div>
-      );
-    };
+      </div>
+      <div class="improve-card" style="background:#2a1f00;border:1px solid rgba(251,191,36,.2);border-left:4px solid #fbbf24">
+        <div class="improve-icon">⚡</div>
+        <div style="flex:1">
+          <div class="improve-title-row"><span class="improve-title">ขยาย LT1 Interval</span><span class="impact-badge" style="color:#fbbf24;background:rgba(251,191,36,.1)">MRS +2 / Conf. +2%</span></div>
+          <div class="improve-desc">3×12min → 4×12min → 2×20min ที่ 6:10–6:30/km pace เดิม แค่เพิ่ม volume ทีละ step</div>
+        </div>
+      </div>
+      <div class="improve-card" style="background:#0d1f35;border:1px solid rgba(96,165,250,.2);border-left:4px solid #60a5fa">
+        <div class="improve-icon">🏃</div>
+        <div style="flex:1">
+          <div class="improve-title-row"><span class="improve-title">Long Run 18–20km</span><span class="impact-badge" style="color:#60a5fa;background:rgba(96,165,250,.1)">MRS +3</span></div>
+          <div class="improve-desc">Long run สัปดาห์ละครั้ง เพิ่มจาก 16 → 18 → 20km ช่วย build base endurance โดยตรง</div>
+        </div>
+      </div>
+      <div class="improve-card" style="background:#1e1035;border:1px solid rgba(196,181,253,.2);border-left:4px solid #c4b5fd">
+        <div class="improve-icon">🎯</div>
+        <div style="flex:1">
+          <div class="improve-title-row"><span class="improve-title">เพิ่ม Z3 Steady Finish</span><span class="impact-badge" style="color:#c4b5fd;background:rgba(196,181,253,.1)">Conf. +3–4%</span></div>
+          <div class="improve-desc">Long run สุดท้าย 3–4km ที่ 6:20–6:30/km สอน body ให้วิ่งเร็วตอนล้า — สำคัญมากสำหรับ Perth</div>
+        </div>
+      </div>
+      <div class="improve-card" style="background:#1a1f2a;border:1px solid rgba(148,163,184,.2);border-left:4px solid #94a3b8">
+        <div class="improve-icon">💆</div>
+        <div style="flex:1">
+          <div class="improve-title-row"><span class="improve-title">Recovery สม่ำเสมอ</span><span class="impact-badge" style="color:#94a3b8;background:rgba(148,163,184,.1)">MRS +1 (ป้องกันลด)</span></div>
+          <div class="improve-desc">Sport Massage ทุก 10–14 วัน + Foam Rolling ทุกวัน + นอน 7h+ ก่อน key session</div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-    function Dashboard() {
-      const [tab, setTab] = useState("overview");
-      const daysToPerth = Math.round((new Date("2026-10-11") - new Date()) / 86400000);
+  <!-- SESSIONS -->
+  <div class="page" id="page-sessions">
+    <div style="font-size:17px;font-weight:700;color:#fff;margin-bottom:16px">Recent Sessions</div>
+    <div id="sessionsList"></div>
+  </div>
 
-      const tabBtn = (id, label) => (
-        <button onClick={() => setTab(id)} style={{
-          flex: 1, padding: "12px 8px", background: tab === id ? "#1e3a2f" : "transparent",
-          border: "none", borderBottom: tab === id ? "3px solid #4ade80" : "3px solid transparent",
-          color: tab === id ? "#4ade80" : "#64748b", fontSize: 14,
-          fontWeight: tab === id ? 700 : 500, cursor: "pointer", fontFamily: "inherit",
-        }}>{label}</button>
-      );
+  <!-- UPCOMING -->
+  <div class="page" id="page-upcoming">
+    <div style="font-size:17px;font-weight:700;color:#fff;margin-bottom:4px">Upcoming Sessions</div>
+    <div style="font-size:13px;color:#64748b;margin-bottom:16px">P'Mean Training Plan — May 16–31</div>
+    <div id="upcomingList"></div>
+    <div class="card" style="margin-top:20px">
+      <div class="card-title" style="margin-bottom:16px">📦 Weekly Volume Targets</div>
+      <div class="vol-row">
+        <div class="vol-header"><span style="font-size:14px;color:#e2e8f0;font-weight:600">May 15–18</span><span style="font-size:14px;color:#60a5fa;font-weight:700">30km · Light Week</span></div>
+        <div class="vol-bar-bg"><div class="vol-bar" style="width:50%;background:#60a5fa"></div></div>
+      </div>
+      <div class="vol-row">
+        <div class="vol-header"><span style="font-size:14px;color:#e2e8f0;font-weight:600">May 18–23</span><span style="font-size:14px;color:#fbbf24;font-weight:700">50km · Build Week 🔥</span></div>
+        <div class="vol-bar-bg"><div class="vol-bar" style="width:83%;background:#fbbf24"></div></div>
+      </div>
+      <div class="vol-row">
+        <div class="vol-header"><span style="font-size:14px;color:#e2e8f0;font-weight:600">May 25–31</span><span style="font-size:14px;color:#4ade80;font-weight:700">40km · Recovery Week</span></div>
+        <div class="vol-bar-bg"><div class="vol-bar" style="width:67%;background:#4ade80"></div></div>
+      </div>
+    </div>
+  </div>
 
-      return (
-        <div style={{ minHeight: "100vh", background: "#0f1419", color: "#f1f5f9", fontFamily: "'Segoe UI', system-ui, sans-serif", fontSize: 15 }}>
+  <div class="footer">Updated: May 15, 2026 · Perth Marathon Sub-4:00</div>
+</div>
 
-          {/* Header */}
-          <div style={{ background: "#141c24", borderBottom: "1px solid #1e2d3d", padding: "24px 20px 0" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-              <div>
-                <div style={{ fontSize: 12, color: "#4ade80", fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", marginBottom: 4 }}>🏃 Marathon Training</div>
-                <div style={{ fontSize: 24, fontWeight: 800, color: "#fff" }}>Charat Chukiat</div>
-                <div style={{ fontSize: 14, color: "#64748b", marginTop: 2 }}>Perth Marathon · Oct 11, 2026 · Sub-4:00</div>
-              </div>
-              <div style={{ background: "#0f2d1c", border: "2px solid #4ade80", borderRadius: 16, padding: "14px 20px", textAlign: "center", minWidth: 80 }}>
-                <div style={{ fontSize: 36, fontWeight: 900, color: "#4ade80", lineHeight: 1 }}>{daysToPerth}</div>
-                <div style={{ fontSize: 12, color: "#86efac", fontWeight: 600, marginTop: 4 }}>days left</div>
-              </div>
-            </div>
-            <div style={{ display: "flex", borderTop: "1px solid #1e2d3d" }}>
-              {tabBtn("overview", "Overview")}
-              {tabBtn("sessions", "Sessions")}
-              {tabBtn("upcoming", "Upcoming")}
-            </div>
+<script>
+// Data
+const sessions=[
+  {date:"Mar 15",type:"Long Run",km:18,pace:6.85,hr:143,zone:"Z2",mrs:59,conf:40},
+  {date:"Mar 22",type:"Interval",km:10,pace:6.35,hr:148,zone:"Z3",mrs:60,conf:41},
+  {date:"Mar 29",type:"Long Run",km:20,pace:6.87,hr:144,zone:"Z2",mrs:61,conf:42},
+  {date:"Apr 5", type:"Interval",km:9, pace:6.28,hr:149,zone:"Z3",mrs:61,conf:43},
+  {date:"Apr 12",type:"Long Run",km:22,pace:6.82,hr:143,zone:"Z2",mrs:62,conf:43},
+  {date:"Apr 19",type:"Interval",km:10,pace:6.25,hr:150,zone:"Z3",mrs:62,conf:44},
+  {date:"Apr 26",type:"Long Run",km:24,pace:6.80,hr:142,zone:"Z2",mrs:63,conf:45},
+  {date:"May 9", type:"Long Run",km:16,pace:7.07,hr:139,zone:"Z1/Z2",mrs:63,conf:46},
+  {date:"May 13",type:"Interval",km:6.4,pace:6.53,hr:146,zone:"Z3",mrs:65,conf:48},
+  {date:"May 15",type:"Recovery",km:6, pace:7.73,hr:131,zone:"Z1",mrs:65,conf:48},
+];
+const upcoming=[
+  {date:"May 16",label:"Long Run Q1",      detail:"16km easy @ 6:45–7:00/km",        type:"long"},
+  {date:"May 18",label:"Easy Run + S&C",   detail:"8km @ 6:45–7:00/km",              type:"easy"},
+  {date:"May 19",label:"Easy Run",          detail:"8km @ 6:45–7:00/km",              type:"easy"},
+  {date:"May 20",label:"LT1 Intervals Q2", detail:"2×20min @ 6:10–6:30/km",          type:"interval"},
+  {date:"May 22",label:"Recovery Run",      detail:"5km @ 7:30+/km",                  type:"recovery"},
+  {date:"May 23",label:"Long Run Q1",       detail:"18km (14km easy + 4km steady)",   type:"long"},
+  {date:"May 27",label:"LT1 Intervals Q1", detail:"2×15min @ 6:10–6:30/km",          type:"interval"},
+  {date:"May 30",label:"Long Run Q1",       detail:"15km easy @ 6:45–7:00/km",        type:"long"},
+  {date:"May 31",label:"Skecher Run 10K 🏁",detail:"Race Day!",                       type:"race"},
+];
+const typeColor={long:"#4ade80",easy:"#60a5fa",interval:"#fbbf24",recovery:"#c4b5fd",race:"#f87171"};
+const typeStyle={"Long Run":{bg:"#052e1a",color:"#4ade80",label:"LONG RUN"},"Interval":{bg:"#2d1f02",color:"#fbbf24",label:"INTERVAL"},"Recovery":{bg:"#1e1035",color:"#c4b5fd",label:"RECOVERY"}};
+
+function pf(v){const m=Math.floor(v),s=Math.round((v-m)*60);return m+":"+(s<10?"0":"")+s;}
+
+// Days left
+document.getElementById("daysLeft").textContent=Math.round((new Date("2026-10-11")-new Date())/86400000);
+
+// Tab switching
+function showTab(id,btn){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  document.getElementById("page-"+id).classList.add("active");
+  btn.classList.add("active");
+}
+
+// SVG helpers
+function svgLine(x1,y1,x2,y2,color,w,dash=""){return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-width="${w}" stroke-dasharray="${dash}"/>`;}
+function svgCircle(cx,cy,r,fill){return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${fill}"/>`;}
+function svgText(x,y,txt,color,size,anchor="middle"){return `<text x="${x}" y="${y}" fill="${color}" font-size="${size}" text-anchor="${anchor}">${txt}</text>`;}
+function svgRect(x,y,w,h,fill,rx=4){return `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${fill}" rx="${rx}"/>`;}
+
+// Progress Chart (MRS + Conf)
+function drawProgress(){
+  const W=660,H=200,pl=40,pr=10,pt=10,pb=30;
+  const cw=W-pl-pr,ch=H-pt-pb;
+  const minY=35,maxY=75,rng=maxY-minY;
+  const n=sessions.length;
+  const xStep=cw/(n-1);
+  let html="";
+  // grid
+  for(let v=35;v<=75;v+=10){const y=pt+ch-(v-minY)/rng*ch;html+=svgLine(pl,y,W-pr,y,"#1e2d3d",1);}
+  // y labels
+  for(let v=40;v<=70;v+=10){const y=pt+ch-(v-minY)/rng*ch;html+=svgText(pl-6,y+4,v,"#94a3b8",11,"end");}
+  // x labels
+  sessions.forEach((s,i)=>{const x=pl+i*xStep;html+=svgText(x,H-2,s.date,"#94a3b8",10);});
+  // MRS line
+  let mrs_pts=sessions.map((s,i)=>({x:pl+i*xStep,y:pt+ch-(s.mrs-minY)/rng*ch}));
+  for(let i=0;i<mrs_pts.length-1;i++) html+=svgLine(mrs_pts[i].x,mrs_pts[i].y,mrs_pts[i+1].x,mrs_pts[i+1].y,"#4ade80",2.5);
+  mrs_pts.forEach(p=>html+=svgCircle(p.x,p.y,4,"#4ade80"));
+  // Conf line
+  let conf_pts=sessions.map((s,i)=>({x:pl+i*xStep,y:pt+ch-(s.conf-minY)/rng*ch}));
+  for(let i=0;i<conf_pts.length-1;i++) html+=svgLine(conf_pts[i].x,conf_pts[i].y,conf_pts[i+1].x,conf_pts[i+1].y,"#fbbf24",2.5,"6,3");
+  conf_pts.forEach(p=>html+=svgCircle(p.x,p.y,4,"#fbbf24"));
+  document.getElementById("progressChart").innerHTML=html;
+}
+
+// Zone Chart
+function drawZone(){
+  const W=660,H=180,pl=40,pr=10,pt=10,pb=30;
+  const cw=W-pl-pr,ch=H-pt-pb;
+  const zones=["Z1","Z2","Z3","Z4"];
+  const targets=[20,60,18,2];
+  const actuals=[35,52,12,1];
+  const maxV=70,bw=cw/zones.length;
+  let html="";
+  // grid
+  [0,20,40,60].forEach(v=>{const y=pt+ch-v/maxV*ch;html+=svgLine(pl,y,W-pr,y,"#1e2d3d",1);html+=svgText(pl-6,y+4,v+"","#94a3b8",11,"end");});
+  zones.forEach((z,i)=>{
+    const bx=pl+i*bw;
+    const tw=bw*0.35,gap=bw*0.05;
+    const ty=targets[i]/maxV*ch,ay=actuals[i]/maxV*ch;
+    html+=svgRect(bx+gap,pt+ch-ty,tw,ty,"#475569",4);
+    html+=svgRect(bx+gap+tw+gap,pt+ch-ay,tw,ay,"#4ade80",4);
+    html+=svgText(bx+bw/2,H-2,z,"#94a3b8",13);
+  });
+  document.getElementById("zoneChart").innerHTML=html;
+}
+
+// Pace Chart
+function drawPace(){
+  const W=660,H=180,pl=48,pr=10,pt=10,pb=30;
+  const cw=W-pl-pr,ch=H-pt-pb;
+  const paces=sessions.map(s=>s.pace);
+  const minP=6,maxP=8.5,rng=maxP-minP;
+  const n=sessions.length;
+  const xStep=cw/(n-1);
+  let html="";
+  // grid
+  [6,6.5,7,7.5,8,8.5].forEach(v=>{const y=pt+ch-(v-minP)/rng*ch;html+=svgLine(pl,y,W-pr,y,"#1e2d3d",1);html+=svgText(pl-6,y+4,pf(v),"#94a3b8",10,"end");});
+  // sub-4 ref line
+  const goalY=pt+ch-(5.68-minP)/rng*ch;
+  html+=svgLine(pl,goalY,W-pr,goalY,"#f87171",1.5,"5,3");
+  html+=svgText(W-pr-4,goalY-5,"Sub-4 goal","#f87171",10,"end");
+  // area fill
+  let pts=sessions.map((s,i)=>({x:pl+i*xStep,y:pt+ch-(s.pace-minP)/rng*ch}));
+  let poly=pts.map(p=>`${p.x},${p.y}`).join(" ");
+  let areaPoly=`${pl},${pt+ch} ${poly} ${pl+(n-1)*xStep},${pt+ch}`;
+  html+=`<polygon points="${areaPoly}" fill="rgba(96,165,250,0.12)"/>`;
+  for(let i=0;i<pts.length-1;i++) html+=svgLine(pts[i].x,pts[i].y,pts[i+1].x,pts[i+1].y,"#60a5fa",2.5);
+  pts.forEach(p=>html+=svgCircle(p.x,p.y,4,"#60a5fa"));
+  // x labels
+  sessions.forEach((s,i)=>{const x=pl+i*xStep;html+=svgText(x,H-2,s.date,"#94a3b8",10);});
+  document.getElementById("paceChart").innerHTML=html;
+}
+
+// Sessions list
+function renderSessions(){
+  const el=document.getElementById("sessionsList");
+  el.innerHTML=[...sessions].reverse().map(s=>{
+    const ts=typeStyle[s.type]||{bg:"#1a1f2a",color:"#94a3b8",label:s.type.toUpperCase()};
+    return `<div class="session-card" style="border-left:4px solid ${ts.color}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div style="flex:1">
+          <div class="session-header">
+            <span class="badge" style="background:${ts.bg};color:${ts.color}">${ts.label}</span>
+            <span style="font-size:14px;color:#64748b">${s.date}</span>
           </div>
-
-          <div style={{ padding: "20px 16px", maxWidth: 720, margin: "0 auto" }}>
-
-            {/* OVERVIEW */}
-            {tab === "overview" && (<>
-
-              {/* KPI Cards */}
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12, marginBottom: 20 }}>
-                {[
-                  { label: "Readiness", value: "65", unit: "/100", sub: "↑ +6 since Oct '25", color: "#4ade80", bg: "#0f2d1c", border: "#4ade8040" },
-                  { label: "Sub-4 Conf.", value: "48", unit: "%",   sub: "↑ +8% since Oct '25", color: "#fbbf24", bg: "#2a1f00", border: "#fbbf2440" },
-                  { label: "Next Target", value: "50", unit: "km",  sub: "Week May 18–23",       color: "#60a5fa", bg: "#0d1f35", border: "#60a5fa40" },
-                ].map((k, i) => (
-                  <div key={i} style={{ background: k.bg, border: `1.5px solid ${k.border}`, borderRadius: 14, padding: "16px 12px", textAlign: "center" }}>
-                    <div style={{ fontSize: 12, color: "#94a3b8", fontWeight: 600, marginBottom: 6, textTransform: "uppercase", letterSpacing: 1 }}>{k.label}</div>
-                    <div style={{ fontSize: 28, fontWeight: 900, color: k.color, lineHeight: 1 }}>{k.value}<span style={{ fontSize: 13, fontWeight: 600 }}>{k.unit}</span></div>
-                    <div style={{ fontSize: 11, color: "#64748b", marginTop: 6 }}>{k.sub}</div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Progress Chart */}
-              <div style={{ background: "#141c24", borderRadius: 16, padding: "20px 16px", marginBottom: 16, border: "1px solid #1e2d3d" }}>
-                <div style={{ fontSize: 17, fontWeight: 700, color: "#fff", marginBottom: 2 }}>📈 Progress Over Time</div>
-                <div style={{ fontSize: 13, color: "#64748b", marginBottom: 16 }}>Readiness Score & Sub-4 Confidence</div>
-                <ResponsiveContainer width="100%" height={200}>
-                  <LineChart data={sessions} margin={{ top: 4, right: 8, left: -10, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#1e2d3d" />
-                    <XAxis dataKey="date" tick={{ fontSize: 11, fill: "#94a3b8" }} />
-                    <YAxis domain={[35, 75]} tick={{ fontSize: 11, fill: "#94a3b8" }} />
-                    <Tooltip content={<CustomTooltip />} />
-                    <Line type="monotone" dataKey="mrs"  name="MRS /100"     stroke="#4ade80" strokeWidth={2.5} dot={{ fill: "#4ade80", r: 4 }} />
-                    <Line type="monotone" dataKey="conf" name="Confidence %" stroke="#fbbf24" strokeWidth={2.5} dot={{ fill: "#fbbf24", r: 4 }} strokeDasharray="5 3" />
-                  </LineChart>
-                </ResponsiveContainer>
-                <div style={{ display: "flex", gap: 20, marginTop: 12 }}>
-                  {[["#4ade80","Readiness Score"],["#fbbf24","Sub-4 Confidence %"]].map(([c,l]) => (
-                    <div key={l} style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                      <div style={{ width: 20, height: 3, background: c, borderRadius: 2 }} />
-                      <span style={{ fontSize: 12, color: "#94a3b8" }}>{l}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Zone Distribution */}
-              <div style={{ background: "#141c24", borderRadius: 16, padding: "20px 16px", marginBottom: 16, border: "1px solid #1e2d3d" }}>
-                <div style={{ fontSize: 17, fontWeight: 700, color: "#fff", marginBottom: 2 }}>🎯 Zone Distribution</div>
-                <div style={{ fontSize: 13, color: "#64748b", marginBottom: 12 }}>Actual vs Target — based on Pace & Heart Rate</div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 6, marginBottom: 16 }}>
-                  {paceZoneData.map((z) => (
-                    <div key={z.zone} style={{ background: "#0f1419", borderRadius: 8, padding: "8px 10px", border: "1px solid #1e2d3d" }}>
-                      <div style={{ fontSize: 13, fontWeight: 800, color: "#fff", marginBottom: 4 }}>{z.zone}</div>
-                      <div style={{ fontSize: 10, color: "#60a5fa", marginBottom: 2 }}>⚡ {z.paceRange} /km</div>
-                      <div style={{ fontSize: 10, color: "#f87171" }}>❤️ {z.hrRange} bpm</div>
-                    </div>
-                  ))}
-                </div>
-                <ResponsiveContainer width="100%" height={180}>
-                  <BarChart data={paceZoneData} barCategoryGap="35%" margin={{ top: 0, right: 8, left: -10, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#1e2d3d" vertical={false} />
-                    <XAxis dataKey="zone" tick={{ fontSize: 13, fill: "#94a3b8", fontWeight: 600 }} />
-                    <YAxis tick={{ fontSize: 11, fill: "#94a3b8" }} unit="%" />
-                    <Tooltip content={<CustomTooltip />} formatter={(v) => `${v}%`} />
-                    <Bar dataKey="target" name="Target %" fill="#475569" radius={[6,6,0,0]} />
-                    <Bar dataKey="actual" name="Actual %" fill="#4ade80" radius={[6,6,0,0]} opacity={0.85} />
-                  </BarChart>
-                </ResponsiveContainer>
-                <div style={{ display: "flex", gap: 20, margin: "10px 0" }}>
-                  {[["#475569","Target %"],["#4ade80","Actual %"]].map(([c,l]) => (
-                    <div key={l} style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                      <div style={{ width: 14, height: 14, background: c, borderRadius: 3 }} />
-                      <span style={{ fontSize: 12, color: "#94a3b8" }}>{l}</span>
-                    </div>
-                  ))}
-                </div>
-                <div style={{ background: "#2a1f00", border: "1px solid #f59e0b60", borderRadius: 10, padding: "10px 14px" }}>
-                  <span style={{ fontSize: 13, color: "#fbbf24" }}>⚠️ Z2 under target — 52% vs 60% goal. Tighten easy run pace to 6:45–6:55/km.</span>
-                </div>
-              </div>
-
-              {/* Pace Trend */}
-              <div style={{ background: "#141c24", borderRadius: 16, padding: "20px 16px", marginBottom: 16, border: "1px solid #1e2d3d" }}>
-                <div style={{ fontSize: 17, fontWeight: 700, color: "#fff", marginBottom: 2 }}>⚡ Avg Pace Per Session</div>
-                <div style={{ fontSize: 13, color: "#64748b", marginBottom: 16 }}>min/km across all sessions</div>
-                <ResponsiveContainer width="100%" height={180}>
-                  <AreaChart data={sessions} margin={{ top: 4, right: 8, left: -10, bottom: 0 }}>
-                    <defs>
-                      <linearGradient id="pGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#60a5fa" stopOpacity={0.25} />
-                        <stop offset="95%" stopColor="#60a5fa" stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#1e2d3d" />
-                    <XAxis dataKey="date" tick={{ fontSize: 11, fill: "#94a3b8" }} />
-                    <YAxis domain={[6, 8.5]} tick={{ fontSize: 11, fill: "#94a3b8" }} tickFormatter={paceFormat} />
-                    <Tooltip content={<CustomTooltip />} formatter={(v) => paceFormat(v)} />
-                    <ReferenceLine y={5.68} stroke="#f87171" strokeDasharray="5 3"
-                      label={{ value: "Sub-4 goal", fontSize: 11, fill: "#f87171", position: "insideTopRight" }} />
-                    <Area type="monotone" dataKey="pace" name="Avg Pace" stroke="#60a5fa" strokeWidth={2.5} fill="url(#pGrad)" dot={{ fill: "#60a5fa", r: 4 }} />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-
-              {/* How to Improve */}
-              <div style={{ background: "#141c24", borderRadius: 16, padding: "20px 16px", border: "1px solid #1e2d3d" }}>
-                <div style={{ fontSize: 17, fontWeight: 700, color: "#fff", marginBottom: 4 }}>🚀 How to Move the Numbers</div>
-                <div style={{ fontSize: 13, color: "#64748b", marginBottom: 16 }}>สิ่งที่ต้องทำใน session ถัดๆ ไปเพื่อเพิ่ม MRS & Sub-4 Confidence</div>
-                {[
-                  { icon: "📦", title: "เพิ่ม Z2 Volume",       impact: "MRS +2–3",         color: "#4ade80", bg: "#0f2d1c", border: "#4ade8030", desc: "Easy run ให้อยู่ที่ 6:45–6:55/km จริงๆ อย่าปล่อยให้ drift เกิน 7:05 ทำสม่ำเสมอ 3–4 ครั้ง/สัปดาห์" },
-                  { icon: "⚡", title: "ขยาย LT1 Interval",     impact: "MRS +2 / Conf. +2%", color: "#fbbf24", bg: "#2a1f00", border: "#fbbf2430", desc: "3×12min → 4×12min → 2×20min ที่ 6:10–6:30/km pace เดิม แค่เพิ่ม volume ทีละ step" },
-                  { icon: "🏃", title: "Long Run 18–20km",       impact: "MRS +3",            color: "#60a5fa", bg: "#0d1f35", border: "#60a5fa30", desc: "Long run สัปดาห์ละครั้ง เพิ่มจาก 16 → 18 → 20km ช่วย build base endurance โดยตรง" },
-                  { icon: "🎯", title: "เพิ่ม Z3 Steady Finish", impact: "Conf. +3–4%",       color: "#c4b5fd", bg: "#1e1035", border: "#c4b5fd30", desc: "Long run สุดท้าย 3–4km ที่ 6:20–6:30/km สอน body ให้วิ่งเร็วตอนล้า — สำคัญมากสำหรับ Perth" },
-                  { icon: "💆", title: "Recovery สม่ำเสมอ",     impact: "MRS +1 (ป้องกันลด)", color: "#94a3b8", bg: "#1a1f2a", border: "#94a3b830", desc: "Sport Massage ทุก 10–14 วัน + Foam Rolling ทุกวัน + นอน 7h+ ก่อน key session" },
-                ].map((item) => (
-                  <div key={item.title} style={{ background: item.bg, border: `1px solid ${item.border}`, borderLeft: `4px solid ${item.color}`, borderRadius: 12, padding: "14px 16px", marginBottom: 10, display: "flex", gap: 14, alignItems: "flex-start" }}>
-                    <div style={{ fontSize: 22, lineHeight: 1.2 }}>{item.icon}</div>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6, flexWrap: "wrap", gap: 6 }}>
-                        <span style={{ fontSize: 15, fontWeight: 700, color: "#f1f5f9" }}>{item.title}</span>
-                        <span style={{ fontSize: 12, fontWeight: 700, color: item.color, background: `${item.color}18`, padding: "2px 10px", borderRadius: 6 }}>{item.impact}</span>
-                      </div>
-                      <div style={{ fontSize: 13, color: "#94a3b8", lineHeight: 1.6 }}>{item.desc}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </>)}
-
-            {/* SESSIONS */}
-            {tab === "sessions" && (
-              <div>
-                <div style={{ fontSize: 17, fontWeight: 700, color: "#fff", marginBottom: 16 }}>Recent Sessions</div>
-                {[...sessions].reverse().map((s, i) => {
-                  const ts = typeStyle[s.type] || { bg: "#1a1f2a", color: "#94a3b8", label: s.type.toUpperCase() };
-                  return (
-                    <div key={i} style={{ background: "#141c24", border: "1px solid #1e2d3d", borderLeft: `4px solid ${ts.color}`, borderRadius: 14, padding: "16px", marginBottom: 12 }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                        <div style={{ flex: 1 }}>
-                          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
-                            <span style={{ background: ts.bg, color: ts.color, fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 6, letterSpacing: 1 }}>{ts.label}</span>
-                            <span style={{ fontSize: 14, color: "#64748b" }}>{s.date}</span>
-                          </div>
-                          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px 24px" }}>
-                            {[["Distance", `${s.km} km`], ["Avg Pace", `${paceFormat(s.pace)}/km`], ["Avg HR", `${s.hr} bpm`], ["Zone", s.zone]].map(([k, v]) => (
-                              <div key={k}>
-                                <div style={{ fontSize: 11, color: "#64748b", marginBottom: 1 }}>{k}</div>
-                                <div style={{ fontSize: 15, fontWeight: 700, color: "#e2e8f0" }}>{v}</div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                        <div style={{ textAlign: "center", minWidth: 70, marginLeft: 12 }}>
-                          <div style={{ fontSize: 30, fontWeight: 900, color: "#4ade80", lineHeight: 1 }}>{s.mrs}</div>
-                          <div style={{ fontSize: 11, color: "#64748b", marginBottom: 8 }}>MRS /100</div>
-                          <div style={{ fontSize: 18, fontWeight: 800, color: "#fbbf24" }}>{s.conf}%</div>
-                          <div style={{ fontSize: 11, color: "#64748b" }}>Sub-4</div>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-
-            {/* UPCOMING */}
-            {tab === "upcoming" && (
-              <div>
-                <div style={{ fontSize: 17, fontWeight: 700, color: "#fff", marginBottom: 4 }}>Upcoming Sessions</div>
-                <div style={{ fontSize: 13, color: "#64748b", marginBottom: 16 }}>P'Mean Training Plan — May 16–31</div>
-                {upcomingSessions.map((s, i) => (
-                  <div key={i} style={{ background: s.type === "race" ? "#2d0f0f" : "#141c24", border: `1px solid ${s.type === "race" ? "#f8717180" : "#1e2d3d"}`, borderLeft: `4px solid ${sessionTypeColor[s.type]}`, borderRadius: 14, padding: "14px 16px", marginBottom: 10, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <div>
-                      <div style={{ fontSize: 15, fontWeight: 700, color: "#f1f5f9", marginBottom: 4 }}>{s.label}</div>
-                      <div style={{ fontSize: 13, color: "#94a3b8" }}>{s.detail}</div>
-                    </div>
-                    <div style={{ background: `${sessionTypeColor[s.type]}20`, color: sessionTypeColor[s.type], fontSize: 12, fontWeight: 700, padding: "6px 12px", borderRadius: 8, whiteSpace: "nowrap", marginLeft: 12 }}>{s.date}</div>
-                  </div>
-                ))}
-                <div style={{ background: "#141c24", borderRadius: 16, padding: "20px 16px", marginTop: 20, border: "1px solid #1e2d3d" }}>
-                  <div style={{ fontSize: 17, fontWeight: 700, color: "#fff", marginBottom: 16 }}>📦 Weekly Volume Targets</div>
-                  {[
-                    { week: "May 15–18", km: 30, label: "Light Week",    color: "#60a5fa" },
-                    { week: "May 18–23", km: 50, label: "Build Week 🔥", color: "#fbbf24" },
-                    { week: "May 25–31", km: 40, label: "Recovery Week", color: "#4ade80" },
-                  ].map((w) => (
-                    <div key={w.week} style={{ marginBottom: 16 }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-                        <span style={{ fontSize: 14, color: "#e2e8f0", fontWeight: 600 }}>{w.week}</span>
-                        <span style={{ fontSize: 14, color: w.color, fontWeight: 700 }}>{w.km}km · {w.label}</span>
-                      </div>
-                      <div style={{ height: 10, background: "#1e2d3d", borderRadius: 6, overflow: "hidden" }}>
-                        <div style={{ height: "100%", width: `${(w.km / 60) * 100}%`, background: w.color, borderRadius: 6 }} />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <div style={{ marginTop: 24, textAlign: "center", fontSize: 12, color: "#334155", paddingBottom: 32 }}>
-              Updated: May 15, 2026 · Perth Marathon Sub-4:00
-            </div>
+          <div class="session-body">
+            <div><div class="metric-label">Distance</div><div class="metric-val">${s.km} km</div></div>
+            <div><div class="metric-label">Avg Pace</div><div class="metric-val">${pf(s.pace)}/km</div></div>
+            <div><div class="metric-label">Avg HR</div><div class="metric-val">${s.hr} bpm</div></div>
+            <div><div class="metric-label">Zone</div><div class="metric-val">${s.zone}</div></div>
           </div>
         </div>
-      );
-    }
+        <div class="mrs-box">
+          <div class="mrs-big">${s.mrs}</div>
+          <div class="mrs-label">MRS /100</div>
+          <div class="conf-big">${s.conf}%</div>
+          <div style="font-size:11px;color:#64748b">Sub-4</div>
+        </div>
+      </div>
+    </div>`;
+  }).join("");
+}
 
-    ReactDOM.createRoot(document.getElementById("root")).render(<Dashboard />);
-  </script>
+// Upcoming list
+function renderUpcoming(){
+  const el=document.getElementById("upcomingList");
+  el.innerHTML=upcoming.map(s=>`
+    <div class="upcoming-card ${s.type==="race"?"race":""}" style="border-left:4px solid ${typeColor[s.type]}">
+      <div>
+        <div class="upcoming-title">${s.label}</div>
+        <div class="upcoming-detail">${s.detail}</div>
+      </div>
+      <div class="date-badge" style="background:${typeColor[s.type]}20;color:${typeColor[s.type]}">${s.date}</div>
+    </div>`).join("");
+}
+
+// Init
+drawProgress();
+drawZone();
+drawPace();
+renderSessions();
+renderUpcoming();
+</script>
 </body>
 </html>
